@@ -14,7 +14,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404, redirect, render_to_response
 from django.utils import timezone
 
 from comments.forms import CommentForm
@@ -51,7 +51,7 @@ def post_detail(request, slug=None):
 	share_string = quote_plus(instance.title)
 
 	initial_data = {
-			"title_type": instance.get_title_type,
+			"title_type": instance.get_content_type,
 			"object_id": instance.id
 	}
 	form = CommentForm(request.POST or None, initial=initial_data)
@@ -182,239 +182,15 @@ def post_create(request):
 class ContactWizard(SessionWizardView):
 	template_name = "contact_form.html"
 	def done(self, form_list, **kwargs):
+		instance = Post()
 		form_data = process_form_data(form_list)
+		for form_single in form_list:
+			for key, value in form_single.cleaned_data.items():
+				setattr(instance, key, value)
 
+		instance.save()
 		return render_to_response('done.html', {'form_data' : form_data})
 
 def process_form_data(form_list):
 	form_data = [form.cleaned_data for form in form_list]
 	return form_data
-
-# def snt(request):
-# 	today = timezone.now().date()
-# 	queryset_list_snt = Post.objects.active_snt()#filter(title='Games') #.order_by("-timestamp")
-	
-# 	if request.user.is_staff or request.user.is_superuser:
-# 		queryset_list_snt = Post.objects.active_snt()#filter(tags='SNT Council')#all()
-	
-# 	query = request.GET.get("q")
-# 	if query:
-# 		queryset_list_snt = queryset_list_snt.filter(
-# 				Q(title__icontains=query)|
-# 				Q(content__icontains=query)|
-# 				Q(user__first_name__icontains=query) |
-# 				Q(user__last_name__icontains=query) |
-# 				Q(tags__icontains=query)
-# 				).distinct()
-# 	paginator = Paginator(queryset_list_snt, 10) # Show 25 contacts per page
-# 	page_request_var = "page"
-# 	page = request.GET.get(page_request_var)
-# 	try:
-# 		queryset = paginator.page(page)
-# 	except PageNotAnInteger:
-# 		# If page is not an integer, deliver first page.
-# 		queryset = paginator.page(1)
-# 	except EmptyPage:
-# 		# If page is out of range (e.g. 9999), deliver last page of results.
-# 		queryset = paginator.page(paginator.num_pages)
-
-
-# 	context = {
-# 		"object_list": queryset, 
-# 		"title": "List",
-# 		"page_request_var": page_request_var,
-# 		"today": today,
-# 	}
-# 	return render(request, "snt.html", context)
-
-# def game(request):
-# 	today = timezone.now().date()
-# 	queryset_list = Post.objects.filter(tags__icontains="u'Games and Sports'", publish__lte=timezone.now())#active_snt() #.order_by("-timestamp")
-	
-# 	if request.user.is_staff or request.user.is_superuser:
-# 		queryset_list = Post.objects.filter(tags__icontains="u'Games and Sports'", publish__lte=timezone.now())#active_snt()
-	
-# 	query = request.GET.get("q")
-# 	if query:
-# 		queryset_list_snt = queryset_list_snt.filter(
-# 				Q(title__icontains=query)|
-# 				Q(content__icontains=query)|
-# 				Q(user__first_name__icontains=query) |
-# 				Q(user__last_name__icontains=query) |
-# 				Q(tags__icontains=query)
-# 				).distinct()
-# 	paginator = Paginator(queryset_list, 8) # Show 25 contacts per page
-# 	page_request_var = "page"
-# 	page = request.GET.get(page_request_var)
-# 	try:
-# 		queryset = paginator.page(page)
-# 	except PageNotAnInteger:
-# 		# If page is not an integer, deliver first page.
-# 		queryset = paginator.page(1)
-# 	except EmptyPage:
-# 		# If page is out of range (e.g. 9999), deliver last page of results.
-# 		queryset = paginator.page(paginator.num_pages)
-
-
-# 	context = {
-# 		"object_list": queryset, 
-# 		"title": "List",
-# 		"page_request_var": page_request_var,
-# 		"today": today,
-# 	}
-# 	return render(request, "game.html", context)
-
-
-# def cultural(request):
-# 	today = timezone.now().date()
-# 	queryset_list = Post.objects.filter(tags__icontains="u'Cultural Council'", publish__lte=timezone.now())#active_snt() #.order_by("-timestamp")
-	
-# 	if request.user.is_staff or request.user.is_superuser:
-# 		queryset_list = Post.objects.filter(tags__icontains="u'Cultutal Council'", publish__lte=timezone.now())#active_snt()
-	
-# 	query = request.GET.get("q")
-# 	if query:
-# 		queryset_list = queryset_list.filter(
-# 				Q(title__icontains=query)|
-# 				Q(content__icontains=query)|
-# 				Q(user__first_name__icontains=query) |
-# 				Q(user__last_name__icontains=query) |
-# 				Q(tags__icontains=query)
-# 				).distinct()
-# 	paginator = Paginator(queryset_list, 8) # Show 25 contacts per page
-# 	page_request_var = "page"
-# 	page = request.GET.get(page_request_var)
-# 	try:
-# 		queryset = paginator.page(page)
-# 	except PageNotAnInteger:
-# 		# If page is not an integer, deliver first page.
-# 		queryset = paginator.page(1)
-# 	except EmptyPage:
-# 		# If page is out of range (e.g. 9999), deliver last page of results.
-# 		queryset = paginator.page(paginator.num_pages)
-
-
-# 	context = {
-# 		"object_list": queryset, 
-# 		"title": "List",
-# 		"page_request_var": page_request_var,
-# 		"today": today,
-# 	}
-# 	return render(request, "cultural.html", context)	
-
-
-
-# def fmc(request):
-# 	today = timezone.now().date()
-# 	queryset_list = Post.objects.filter(tags__icontains="u'FMC'", publish__lte=timezone.now())#active_snt() #.order_by("-timestamp")
-	
-# 	if request.user.is_staff or request.user.is_superuser:
-# 		queryset_list = Post.objects.filter(tags__icontains="u'FMC'", publish__lte=timezone.now())#active_snt()
-	
-# 	query = request.GET.get("q")
-# 	if query:
-# 		queryset_list = queryset_list.filter(
-# 				Q(title__icontains=query)|
-# 				Q(content__icontains=query)|
-# 				Q(user__first_name__icontains=query) |
-# 				Q(user__last_name__icontains=query) |
-# 				Q(tags__icontains=query)
-# 				).distinct()
-# 	paginator = Paginator(queryset_list, 8) # Show 25 contacts per page
-# 	page_request_var = "page"
-# 	page = request.GET.get(page_request_var)
-# 	try:
-# 		queryset = paginator.page(page)
-# 	except PageNotAnInteger:
-# 		# If page is not an integer, deliver first page.
-# 		queryset = paginator.page(1)
-# 	except EmptyPage:
-# 		# If page is out of range (e.g. 9999), deliver last page of results.
-# 		queryset = paginator.page(paginator.num_pages)
-
-
-# 	context = {
-# 		"object_list": queryset, 
-# 		"title": "List",
-# 		"page_request_var": page_request_var,
-# 		"today": today,
-# 	}
-# 	return render(request, "fmc.html", context)		
-
-
-# def vox(request):
-# 	today = timezone.now().date()
-# 	queryset_list = Post.objects.filter(tags__icontains="u'Vox Populi'", publish__lte=timezone.now())#active_snt() #.order_by("-timestamp")
-	
-# 	if request.user.is_staff or request.user.is_superuser:
-# 		queryset_list = Post.objects.filter(tags__icontains="u'Vox Populi'", publish__lte=timezone.now())#active_snt()
-	
-# 	query = request.GET.get("q")
-# 	if query:
-# 		queryset_list = queryset_list.filter(
-# 				Q(title__icontains=query)|
-# 				Q(content__icontains=query)|
-# 				Q(user__first_name__icontains=query) |
-# 				Q(user__last_name__icontains=query) |
-# 				Q(tags__icontains=query)
-# 				).distinct()
-# 	paginator = Paginator(queryset_list, 8) # Show 25 contacts per page
-# 	page_request_var = "page"
-# 	page = request.GET.get(page_request_var)
-# 	try:
-# 		queryset = paginator.page(page)
-# 	except PageNotAnInteger:
-# 		# If page is not an integer, deliver first page.
-# 		queryset = paginator.page(1)
-# 	except EmptyPage:
-# 		# If page is out of range (e.g. 9999), deliver last page of results.
-# 		queryset = paginator.page(paginator.num_pages)
-
-
-# 	context = {
-# 		"object_list": queryset, 
-# 		"title": "List",
-# 		"page_request_var": page_request_var,
-# 		"today": today,
-# 	}
-# 	return render(request, "vox.html", context)	
-
-
-# def senate(request):
-# 	today = timezone.now().date()
-# 	queryset_list = Post.objects.filter(tags__icontains="u'Senate'", publish__lte=timezone.now())#active_snt() #.order_by("-timestamp")
-	
-# 	if request.user.is_staff or request.user.is_superuser:
-# 		queryset_list = Post.objects.filter(tags__icontains="u'Senate'", publish__lte=timezone.now())#active_snt()
-	
-# 	query = request.GET.get("q")
-# 	if query:
-# 		queryset_list = queryset_list.filter(
-# 				Q(title__icontains=query)|
-# 				Q(content__icontains=query)|
-# 				Q(user__first_name__icontains=query) |
-# 				Q(user__last_name__icontains=query) |
-# 				Q(tags__icontains=query)
-# 				).distinct()
-# 	paginator = Paginator(queryset_list, 8) # Show 25 contacts per page
-# 	page_request_var = "page"
-# 	page = request.GET.get(page_request_var)
-# 	try:
-# 		queryset = paginator.page(page)
-# 	except PageNotAnInteger:
-# 		# If page is not an integer, deliver first page.
-# 		queryset = paginator.page(1)
-# 	except EmptyPage:
-# 		# If page is out of range (e.g. 9999), deliver last page of results.
-# 		queryset = paginator.page(paginator.num_pages)
-
-
-# 	context = {
-# 		"object_list": queryset, 
-# 		"title": "List",
-# 		"page_request_var": page_request_var,
-# 		"today": today,
-# 	}
-# 	return render(request, "senate.html", context)	
-
-
