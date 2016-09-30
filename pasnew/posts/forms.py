@@ -3,7 +3,9 @@ from django import forms
 from pagedown.widgets import PagedownWidget
 from django.utils import timezone
 from .models import Post
-
+from .models import Program_Department_Relationship
+from .models import Department
+from .models import Program
 
 
 
@@ -16,6 +18,7 @@ class PostForm1(forms.ModelForm):
         fields = [
             "title",
             "salary",
+            "file",
         ]
 
 class PostForm2(forms.ModelForm):
