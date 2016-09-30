@@ -48,7 +48,10 @@ class Post(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, default=1)
     title = models.CharField(max_length=120)
     slug = models.SlugField(unique=True)
-    
+    file = models.FileField(
+            null=True, 
+            blank=True, 
+            )
     salary = models.TextField()
     experience_required = models.TextField()
     field1 = models.TextField()
@@ -121,6 +124,33 @@ def pre_save_post_receiver(sender, instance, *args, **kwargs):
 
 pre_save.connect(pre_save_post_receiver, sender=Post)
 
+
+
+class Program(models.Model):
+    program_name = models.CharField(max_length = 200)
+    value = models.IntegerField(default = 1)
+
+    def __str__(self):
+        return self.program_name
+
+
+class Department(models.Model):
+
+    
+    deptt_name = models.CharField(max_length = 200)
+    
+    def __str__(self):
+        return self.deptt_name
+
+
+class Program_Department_Relationship(models.Model):
+    program = models.CharField(max_length=100,default="")
+    deptt = models.CharField(max_length=100,default="") 
+    program_name = models.ForeignKey(Program,on_delete= models.CASCADE)
+    deptt_name = models.ForeignKey(Department,on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.deptt+'-'+self.program
 
 
 

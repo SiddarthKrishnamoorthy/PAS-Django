@@ -17,8 +17,6 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404, redirect, render_to_response
 from django.utils import timezone
 
-from comments.forms import CommentForm
-from comments.models import Comment
 # from .forms import PostForm
 from .models import Post
 
@@ -54,41 +52,11 @@ def post_detail(request, slug=None):
 			"title_type": instance.get_content_type,
 			"object_id": instance.id
 	}
-	form = CommentForm(request.POST or None, initial=initial_data)
-	if form.is_valid() and request.user.is_authenticated():
-		c_type = form.cleaned_data.get("title_type")
-		title_type = ContentType.objects.get(model=c_type)
-		obj_id = form.cleaned_data.get('object_id')
-		title_data = form.cleaned_data.get("title")
-		parent_obj = None
-		try:
-			parent_id = int(request.POST.get("parent_id"))
-		except:
-			parent_id = None
-
-		if parent_id:
-			parent_qs = Comment.objects.filter(id=parent_id)
-			if parent_qs.exists() and parent_qs.count() == 1:
-				parent_obj = parent_qs.first()
-
-
-		new_comment, created = Comment.objects.get_or_create(
-							user = request.user,
-							title_type= title_type,
-							object_id = obj_id,
-							title = title_data,
-							parent = parent_obj,
-						)
-		return HttpResponseRedirect(new_comment.title_object.get_absolute_url())
-
-
-	comments = instance.comments
+	
 	context = {
 		"title": instance.title,
 		"instance": instance,
 		"share_string": share_string,
-		"comments": comments,
-		"comment_form":form,
 	}
 	return render(request, "post_detail.html", context)
 
