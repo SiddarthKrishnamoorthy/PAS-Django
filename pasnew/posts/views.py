@@ -20,7 +20,9 @@ from django.utils import timezone
 from .models import Post
 
 from formtools.wizard.views import SessionWizardView
-
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+import os
 
 
 def post_create(request):
@@ -129,27 +131,11 @@ def post_delete(request, slug=None):
 	return redirect("posts:list")
 
 
-def post_create(request):
-	if not request.user.is_staff or not request.user.is_superuser:
-		raise Http404
-		
-	form = PostForm(request.POST or None, request.FILES or None)
-	if form.is_valid():
-		instance = form.save(commit=False)
-		instance.user = request.user
-		instance.save()
-		# message success
-		messages.success(request, "Successfully Created")
-		return HttpResponseRedirect(instance.get_absolute_url())
-	context = {
-		"form": form,
-	}
-	return render(request, "post_form.html", context)
-
 
 class ContactWizard(SessionWizardView):
 	template_name = "contact_form.html"
-	def done(self, form_list, **kwargs):
+	file_storage = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'media_cdn'))
+	def done(self, form_list,  **kwargs):
 		instance = Post()
 		form_data = process_form_data(form_list)
 		for form_single in form_list:
