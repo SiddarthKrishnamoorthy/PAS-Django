@@ -88,7 +88,7 @@ class Post(models.Model):
     field4 = models.TextField()
     field5 = models.TextField()
 
-    programDepartmentRelationship = models.ForeignKey(Program_Department_Relationship, on_delete=models.CASCADE, null=True, blank=True)
+    programDepartmentRelationship = models.ManyToManyField(Program_Department_Relationship, null=True, blank=True)
 
     # tags=models.CharField(max_length=120,  null=True, blank=False)
     draft = models.BooleanField(default=False)

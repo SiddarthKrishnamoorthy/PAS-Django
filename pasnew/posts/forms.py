@@ -12,7 +12,7 @@ from .models import Program
 class PostForm1(forms.ModelForm):
     experience_required = forms.CharField(widget=PagedownWidget(show_preview=False))
     publish = forms.DateField(widget=forms.SelectDateWidget(),initial=timezone.now())
-    checkbox = forms.ModelMultipleChoiceField(
+    checkboxes = forms.ModelMultipleChoiceField(
         queryset=Program_Department_Relationship.objects.all(),
         widget=forms.CheckboxSelectMultiple)
     
