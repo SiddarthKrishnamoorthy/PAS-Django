@@ -43,8 +43,7 @@ INSTALLED_APPS = [
     'pagedown',
     'formtools',
 
-    'posts',
-    'django_tables2'
+    'posts'
 ]
 
 MIDDLEWARE_CLASSES = [

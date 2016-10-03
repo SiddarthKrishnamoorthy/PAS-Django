@@ -20,6 +20,32 @@ from .utils import get_read_time
 #Post.objects.all()
 #Post.objects.create(user=user, title="Some time")
 
+class Program(models.Model):
+    program_name = models.CharField(max_length = 200)
+    value = models.IntegerField(default = 1)
+
+    def __str__(self):
+        return self.program_name
+
+
+class Department(models.Model):
+
+    
+    deptt_name = models.CharField(max_length = 200)
+    
+    def __str__(self):
+        return self.deptt_name
+
+
+class Program_Department_Relationship(models.Model):
+    program = models.CharField(max_length=100,default="")
+    deptt = models.CharField(max_length=100,default="") 
+    program_name = models.ForeignKey(Program,on_delete= models.CASCADE, blank=True, null=True)
+    deptt_name = models.ForeignKey(Department,on_delete=models.CASCADE, blank=True, null=True)
+
+    def __str__(self):
+        return self.deptt+'-'+self.program
+
 
 class PostManager(models.Manager):
     def active(self, *args, **kwargs):
@@ -44,6 +70,8 @@ def upload_location(instance, filename):
     """
     return "%s/%s" %(new_id, filename)
 
+
+
 class Post(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, default=1)
     title = models.CharField(max_length=120)
@@ -59,6 +87,8 @@ class Post(models.Model):
     field3 = models.TextField()
     field4 = models.TextField()
     field5 = models.TextField()
+
+    programDepartmentRelationship = models.ManyToManyField(Program_Department_Relationship, null=True, blank=True)
 
     # tags=models.CharField(max_length=120,  null=True, blank=False)
     draft = models.BooleanField(default=False)
@@ -123,34 +153,6 @@ def pre_save_post_receiver(sender, instance, *args, **kwargs):
 
 
 pre_save.connect(pre_save_post_receiver, sender=Post)
-
-
-
-class Program(models.Model):
-    program_name = models.CharField(max_length = 200)
-    value = models.IntegerField(default = 1)
-
-    def __str__(self):
-        return self.program_name
-
-
-class Department(models.Model):
-
-    
-    deptt_name = models.CharField(max_length = 200)
-    
-    def __str__(self):
-        return self.deptt_name
-
-
-class Program_Department_Relationship(models.Model):
-    program = models.CharField(max_length=100,default="")
-    deptt = models.CharField(max_length=100,default="") 
-    program_name = models.ForeignKey(Program,on_delete= models.CASCADE)
-    deptt_name = models.ForeignKey(Department,on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.deptt+'-'+self.program
 
 
 

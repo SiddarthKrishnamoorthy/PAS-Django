@@ -23,6 +23,7 @@ from formtools.wizard.views import SessionWizardView
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 import os
+from posts.models import Program_Department_Relationship
 
 
 def post_create(request):
@@ -140,7 +141,12 @@ class ContactWizard(SessionWizardView):
 		form_data = process_form_data(form_list)
 		for form_single in form_list:
 			for key, value in form_single.cleaned_data.items():
-				setattr(instance, key, value)
+				if key == 'checkboxes':
+					# do something
+					for item in self.request.POST.getlist('checkboxes'):
+						Post.Program_Department_Relationship.add(item)
+				else:
+					setattr(instance, key, value)
 
 		instance.save()
 		return render_to_response('done.html', {'form_data' : form_data})
